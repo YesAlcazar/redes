@@ -3,10 +3,10 @@ import time
 import os
 
 # Replicador de mensagens entre portas seriais
-if __init__ == '__main__':
+if __name__ == '__main__':
     # Configuração e abertura das portas seriais
     ports = list(map(int,input("Digite as portas seriais: ").split()))
-    serial_ports = list(serial.Serial('/dev/pts/{port}', timeout=1) for port in ports)
+    serial_ports = list(serial.Serial(f"/dev/pts/{port}", timeout=1) for port in ports)
     for serial_port in serial_ports:
         print(f"Conectado à porta: {serial_port.name}")
     #Modo de operação de replicação de mensagens
