@@ -1,0 +1,54 @@
+### XMODEM
+
+O **Xmodem** é um protocolo simples de comunicação usado principalmente para a transferência de arquivos via conexões seriais (como portas RS-232). Criado em 1977 por Ward Christensen, o Xmodem foi um dos primeiros protocolos de transferência de arquivos amplamente adotado, especialmente nos primeiros dias da computação pessoal e BBS (Bulletin Board System). A simplicidade de sua implementação e seu suporte a modems e linhas telefônicas de baixa qualidade foram seus principais atrativos.
+
+### Estrutura do Xmodem
+
+O protocolo Xmodem divide o arquivo a ser transferido em pacotes de **128 bytes**. Cada pacote é enviado com uma estrutura específica, que inclui bits de controle e verificação de erros para garantir a integridade da transmissão.
+
+A estrutura básica de um pacote Xmodem é a seguinte:
+
+1. **SOH (Start of Header)**: Um byte de início de pacote, com valor **0x01**, que indica o início de um pacote.
+2. **Número do pacote**: Um byte que representa o número do pacote atual (inicia em 1).
+3. **Complemento do número do pacote**: O complemento bit a bit do número do pacote (ou seja, 255 - número do pacote).
+4. **Dados**: 128 bytes de dados do arquivo. Se o último pacote tiver menos de 128 bytes de dados, os bytes restantes são preenchidos com um caractere especial (normalmente o código ASCII **0x1A**, conhecido como substituto de arquivo ou EOF).
+5. **Checksum**: Um byte que representa a soma simples (mod 256) de todos os bytes de dados para verificação de erros.
+
+### Funcionamento do Xmodem
+
+O Xmodem usa um sistema de comunicação **half-duplex** com controle de erro básico baseado em **ACK/NACK**. Isso significa que, para cada pacote enviado, o receptor precisa confirmar se o pacote foi recebido corretamente antes que o próximo seja enviado. O processo de transmissão segue os seguintes passos:
+
+1. **Início da transmissão**:
+   - O receptor inicia o processo enviando um **caractere NAK** (valor ASCII 0x15), indicando que está pronto para receber um pacote.
+   
+2. **Envio do pacote**:
+   - O transmissor envia um pacote de 128 bytes, começando com o caractere **SOH**. O pacote inclui o número do pacote, o complemento, os dados e o checksum.
+   
+3. **Verificação de erros**:
+   - O receptor verifica se o pacote foi recebido corretamente, calculando o checksum dos dados recebidos e comparando-o com o checksum enviado. Se o checksum for correto, o receptor envia um **ACK** (valor ASCII 0x06), indicando que o transmissor pode enviar o próximo pacote.
+   - Se houver erro (checksum incorreto ou falha na transmissão), o receptor envia um **NAK**, solicitando que o transmissor reenvie o último pacote.
+
+4. **Fim da transmissão**:
+   - Quando todos os pacotes são enviados, o transmissor envia um caractere **EOT** (End of Transmission, valor ASCII 0x04) para indicar o fim da transferência. O receptor confirma o término enviando um **ACK** final.
+
+### Implementação do Xmodem Original
+
+A implementação original do Xmodem é bastante simples e usa uma abordagem de controle de fluxo baseada em temporização e respostas ACK/NAK. Algumas características importantes da implementação original incluem:
+
+- **Temporização**: O transmissor aguarda um tempo determinado para receber um ACK ou NAK antes de considerar que o pacote foi perdido. Se nenhum ACK/NAK for recebido nesse tempo, o transmissor tenta reenviar o pacote.
+- **Reenvio de pacotes**: O Xmodem limita o número de tentativas de envio de um pacote em caso de erro. Se o receptor não responder com ACK após algumas tentativas (geralmente 10 tentativas), a transferência é abortada.
+- **Verificação simples de erros**: O Xmodem original usa um checksum simples de 8 bits para detectar erros de transmissão. Esse método é eficaz para detectar erros únicos, mas pode falhar em detectar alguns tipos de erros múltiplos.
+
+### Variações do Xmodem
+
+Com o passar do tempo, foram desenvolvidas variações do protocolo Xmodem para melhorar a eficiência e a detecção de erros:
+
+- **Xmodem-CRC**: Utiliza uma verificação de erro baseada em CRC (Cyclic Redundancy Check) de 16 bits, que é mais robusta do que o simples checksum.
+- **Xmodem-1K**: Usa pacotes maiores, de 1024 bytes, para aumentar a velocidade de transmissão em links de maior largura de banda.
+- **Ymodem**: Uma evolução do Xmodem que permite a transferência de múltiplos arquivos em uma única sessão, além de suportar pacotes de 1024 bytes e CRC.
+- **Zmodem**: Protocolo mais avançado, que adiciona várias funcionalidades como compressão e recuperação de transferência interrompida.
+
+referencias :
+https://en.wikipedia.org/wiki/XMODEM
+https://dqsoft.blogspot.com/2009/03/o-protocolo-xmodem.html
+
